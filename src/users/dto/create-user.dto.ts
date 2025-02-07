@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserEntity } from '../entities/user.entity';
-import { Role } from '../../model/user.entity';
+import { Role } from '@prisma/client';
 
 export class CreateUserDto extends UserEntity {
   @IsString()

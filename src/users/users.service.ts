@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +16,11 @@ export class UsersService {
 
   async comparePassword(
     password: string,
-    hashedPassword: string,
+    hashedPassword?: string,
   ): Promise<boolean> {
+    if (!hashedPassword) {
+      return false;
+    }
     return await bcrypt.compare(password, hashedPassword);
   }
 
@@ -75,12 +79,20 @@ export class UsersService {
     });
   }
 
-  async findOneByEmail(email: string) {
-    return this.databaseService.user.findUnique({
+  async findOneByEmail(email: string): Promise<UserEntity | null> {
+    const user = await this.databaseService.user.findUnique({
       where: {
         email,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        password: true,
+      },
     });
+    return user ? user : null;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
