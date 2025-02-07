@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserEntity } from '../entities/user.entity';
-import { Role } from '@prisma/client';
+import { UserRoles } from '../entities/user.roles';
 
 export class CreateUserDto extends UserEntity {
   @IsString()
@@ -16,7 +16,7 @@ export class CreateUserDto extends UserEntity {
   @IsEmail()
   email: string;
   @IsEnum({ ADMIN: 'ADMIN', USER: 'USER' }, { message: 'Valid Role Required' })
-  role: Role;
+  role: UserRoles;
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(20, { message: 'Password must not exceed 20 characters' })

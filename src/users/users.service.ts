@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
+import { UserRoles } from './entities/user.roles';
 
 @Injectable()
 export class UsersService {
@@ -92,7 +93,7 @@ export class UsersService {
         password: true,
       },
     });
-    return user ? user : null;
+    return user ? { ...user, role: user.role as UserRoles } : null;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
