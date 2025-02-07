@@ -75,6 +75,14 @@ export class UsersService {
     });
   }
 
+  async findOneByEmail(email: string) {
+    return this.databaseService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     const hashedPassword = updateUserDto.password
       ? await this.hashPassword(updateUserDto.password)
