@@ -16,7 +16,7 @@ export class AuthService {
       user &&
       (await this.usersService.comparePassword(pass, user.password))
     ) {
-      const { password, ...result } = user;
+      const { password, ...result } = user; // eslint-disable-line @typescript-eslint/no-unused-vars
       return result;
     }
     return null;
@@ -24,6 +24,7 @@ export class AuthService {
 
   login(user: UserEntity) {
     const payload = {
+      id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
