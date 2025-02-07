@@ -24,6 +24,12 @@ export class UsersService {
     createUserDto.password = await this.hashPassword(createUserDto.password);
     return this.databaseService.user.create({
       data: createUserDto,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
     });
   }
 
@@ -33,19 +39,38 @@ export class UsersService {
         where: {
           role,
         },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
       });
       if (users.length === 0) {
         throw new NotFoundException('User not found');
       }
       return users;
     }
-    return this.databaseService.user.findMany();
+    return this.databaseService.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
   }
 
   async findOne(id: number) {
     return this.databaseService.user.findUnique({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
       },
     });
   }
@@ -62,6 +87,12 @@ export class UsersService {
         id,
       },
       data: updateUserDto,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
     });
   }
 
@@ -69,6 +100,12 @@ export class UsersService {
     return this.databaseService.user.delete({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
       },
     });
   }
