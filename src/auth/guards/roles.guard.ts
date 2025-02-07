@@ -7,8 +7,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { UserEntity } from '../../users/entities/user.entity';
-import { ROLES_KEY } from '../has-roles.decorator';
+import { ROLES_KEY } from '../decorators/has-roles.decorator';
 import { UsersService } from '../../users/users.service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,10 +19,10 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredRoles) {
       return true;
     }
