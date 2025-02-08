@@ -18,7 +18,6 @@ async function bootstrap() {
     JSON.stringify(documentFactory(), null, 2),
   );
   SwaggerModule.setup('api', app, documentFactory);
-  app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
