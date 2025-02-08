@@ -17,8 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { HasRoles } from '../auth/decorators/has-roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserRoles } from './entities/user.roles';
-import { UserEntity } from './entities/user.entity';
+import { Role, User } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
@@ -29,7 +28,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @HasRoles(UserRoles.ADMIN)
+  @HasRoles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll() {
@@ -40,7 +39,7 @@ export class UsersController {
   @Get(':id')
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-    @Request() req: { user: UserEntity },
+    @Request() req: { user: User },
   ) {
     this.usersService.ensureOwnershipOrAdmin(id, req.user);
     return this.usersService.findOne(id);
@@ -51,18 +50,18 @@ export class UsersController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
-    @Request() req: { user: UserEntity },
+    @Request() req: { user: User },
   ) {
     this.usersService.ensureOwnershipOrAdmin(id, req.user);
     return this.usersService.update(id, updateUserDto);
   }
 
-  @HasRoles(UserRoles.ADMIN)
+  @HasRoles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @Request() req: { user: UserEntity },
+    @Request() req: { user: User },
   ) {
     this.usersService.ensureNotSelfDeletion(id, req.user);
     return this.usersService.remove(id);

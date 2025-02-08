@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from '../users/entities/user.entity';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -10,19 +10,18 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<UserEntity | null> {
+  async validateUser(email: string, pass: string): Promise<User | null> {
     const user = await this.usersService.findOneByEmail(email);
     if (
       user &&
       (await this.usersService.comparePassword(pass, user.password))
     ) {
-      const { password, ...result } = user; // eslint-disable-line @typescript-eslint/no-unused-vars
-      return result;
+      return user;
     }
     return null;
   }
 
-  login(user: UserEntity) {
+  login(user: User) {
     const payload = {
       id: user.id,
       email: user.email,

@@ -8,8 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from './entities/user.entity';
-import { UserRoles } from './entities/user.roles';
+import { Role, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -30,15 +29,15 @@ export class UsersService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  ensureOwnershipOrAdmin(userId: number, currentUser: UserEntity) {
-    if (currentUser.role !== UserRoles.ADMIN && currentUser.id !== userId) {
+  ensureOwnershipOrAdmin(userId: number, currentUser: User) {
+    if (currentUser.role !== Role.ADMIN && currentUser.id !== userId) {
       throw new ForbiddenException(
         'You are not authorised to perform this action',
       );
     }
   }
 
-  ensureNotSelfDeletion(userId: number, currentUser: UserEntity) {
+  ensureNotSelfDeletion(userId: number, currentUser: User) {
     if (currentUser.id === userId) {
       throw new ForbiddenException('You cannot delete yourself');
     }
@@ -110,23 +109,16 @@ export class UsersService {
     return user;
   }
 
-  async findOneByEmail(email: string): Promise<UserEntity | null> {
+  async findOneByEmail(email: string): Promise<User | null> {
     const user = await this.databaseService.user.findUnique({
       where: {
         email,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        password: true,
       },
     });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user ? { ...user, role: user.role as UserRoles } : null;
+    return user ? { ...user, role: user.role } : null;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

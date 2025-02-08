@@ -6,11 +6,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { UserEntity } from '../entities/user.entity';
-import { UserRoles } from '../entities/user.roles';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
-export class CreateUserDto extends UserEntity {
+export class CreateUserDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -20,7 +19,7 @@ export class CreateUserDto extends UserEntity {
   email: string;
   @ApiProperty()
   @IsEnum({ ADMIN: 'ADMIN', USER: 'USER' }, { message: 'Valid Role Required' })
-  role: UserRoles;
+  role: Role;
   @ApiProperty()
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
