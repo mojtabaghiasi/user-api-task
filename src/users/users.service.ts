@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
@@ -25,7 +30,28 @@ export class UsersService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
+  ensureOwnershipOrAdmin(userId: number, currentUser: UserEntity) {
+    if (currentUser.role !== UserRoles.ADMIN && currentUser.id !== userId) {
+      throw new ForbiddenException(
+        'You are not authorised to perform this action',
+      );
+    }
+  }
+
+  ensureNotSelfDeletion(userId: number, currentUser: UserEntity) {
+    if (currentUser.id === userId) {
+      throw new ForbiddenException('You cannot delete yourself');
+    }
+  }
+
   async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.databaseService.user.findUnique({
+      where: { email: createUserDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('A user with this email already exists.');
+    }
     createUserDto.password = await this.hashPassword(createUserDto.password);
     return this.databaseService.user.create({
       data: createUserDto,
@@ -67,7 +93,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return this.databaseService.user.findUnique({
+    const user = await this.databaseService.user.findUnique({
       where: {
         id,
       },
@@ -78,6 +104,10 @@ export class UsersService {
         role: true,
       },
     });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async findOneByEmail(email: string): Promise<UserEntity | null> {
@@ -93,10 +123,27 @@ export class UsersService {
         password: true,
       },
     });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return user ? { ...user, role: user.role as UserRoles } : null;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    const existingUserById = await this.databaseService.user.findUnique({
+      where: { id },
+    });
+    if (!existingUserById) {
+      throw new NotFoundException('User not found');
+    }
+    if (updateUserDto.email) {
+      const existingUser = await this.databaseService.user.findUnique({
+        where: { email: updateUserDto.email },
+      });
+      if (existingUser) {
+        throw new ConflictException('A user with this email already exists.');
+      }
+    }
     const hashedPassword = updateUserDto.password
       ? await this.hashPassword(updateUserDto.password)
       : undefined;
@@ -118,6 +165,12 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    const existingUserById = await this.databaseService.user.findUnique({
+      where: { id },
+    });
+    if (!existingUserById) {
+      throw new NotFoundException('User not found');
+    }
     return this.databaseService.user.delete({
       where: {
         id,

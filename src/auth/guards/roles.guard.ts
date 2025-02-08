@@ -31,35 +31,11 @@ export class RolesGuard implements CanActivate {
       .switchToHttp()
       .getRequest<Request & { user: UserEntity }>();
     const user = request.user;
-    const userIdFromParams = Number(request.params.id);
 
     const hasRequiredRole = requiredRoles.some((role) => user?.role === role);
     if (!hasRequiredRole) {
       throw new ForbiddenException('You are not authorized.');
     }
-
-    if (user.role === UserRoles.USER) {
-      if (
-        (request.method === 'GET' || request.method === 'PATCH') &&
-        userIdFromParams === user.id
-      ) {
-        return true;
-      }
-      throw new ForbiddenException(
-        'You are not authorised to perform this action.',
-      );
-    }
-    if (user.role === UserRoles.ADMIN) {
-      if (request.method === 'DELETE') {
-        if (user.id === userIdFromParams) {
-          throw new ForbiddenException('You cannot delete yourself.');
-        }
-        return true;
-      }
-      return true;
-    }
-    throw new ForbiddenException(
-      'You are not authorised to perform this action.',
-    );
+    return true;
   }
 }
