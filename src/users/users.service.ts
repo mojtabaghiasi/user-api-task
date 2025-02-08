@@ -7,7 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Role, User } from '@prisma/client';
 
 @Injectable()
@@ -63,7 +63,7 @@ export class UsersService {
     });
   }
 
-  async findAll(role?: 'ADMIN' | 'USER') {
+  async findAll(role?: Role) {
     if (role) {
       const users = await this.databaseService.user.findMany({
         where: {

@@ -1,0 +1,36 @@
+services:
+  user-api-node-app:
+    container_name: user-api-node-app
+    build:
+      dockerfile: Dockerfile
+    pull_policy: always
+    restart: always
+    ports:
+      - "3010:3000"
+      - "9229:9229"
+    depends_on:
+      - user-api-postgres
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - task_network
+
+  user-api-postgres:
+    container_name: user-api-postgres
+    image: postgres:16.2-alpine3.19
+    restart: always
+    environment:
+      - POSTGRES_USER=${PGDB_USERNAME}
+      - POSTGRES_PASSWORD=${PGDB_PASSWORD}
+      - POSTGRES_DB=user_api_task_db
+    ports:
+      - "15432:5432"
+    volumes:
+      - ${PERSIST_VOLUME_PATH_POSTGRES:-~/deploy/user-api-data/postgres_data}:/var/lib/postgresql/data/
+    networks:
+      - task_network
+
+networks:
+  task_network:
+    driver: bridge
