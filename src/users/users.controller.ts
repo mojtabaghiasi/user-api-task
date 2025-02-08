@@ -14,9 +14,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { HasRoles } from '../auth/decorators/has-roles.decorator';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { HasRoles } from '../common/decorators/has-roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { Role, User } from '@prisma/client';
 
 @Controller('users')

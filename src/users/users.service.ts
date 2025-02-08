@@ -7,27 +7,15 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
-import * as bcrypt from 'bcryptjs';
 import { Role, User } from '@prisma/client';
+import { PasswordHelper } from '../common/helpers/password.helper';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly databaseService: DatabaseService) {}
-
-  async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    return await bcrypt.hash(password, saltRounds);
-  }
-
-  async comparePassword(
-    password: string,
-    hashedPassword?: string,
-  ): Promise<boolean> {
-    if (!hashedPassword) {
-      return false;
-    }
-    return await bcrypt.compare(password, hashedPassword);
-  }
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly passwordHelper: PasswordHelper,
+  ) {}
 
   ensureOwnershipOrAdmin(userId: number, currentUser: User) {
     if (currentUser.role !== Role.ADMIN && currentUser.id !== userId) {
@@ -51,7 +39,9 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('A user with this email already exists.');
     }
-    createUserDto.password = await this.hashPassword(createUserDto.password);
+    createUserDto.password = await this.passwordHelper.hashPassword(
+      createUserDto.password,
+    );
     return this.databaseService.user.create({
       data: createUserDto,
       select: {
@@ -137,7 +127,7 @@ export class UsersService {
       }
     }
     const hashedPassword = updateUserDto.password
-      ? await this.hashPassword(updateUserDto.password)
+      ? await this.passwordHelper.hashPassword(updateUserDto.password)
       : undefined;
     if (hashedPassword) {
       updateUserDto.password = hashedPassword;
