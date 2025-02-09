@@ -34,8 +34,7 @@ This project is a **User Management System** implemented as part of the task. It
 1. **Clone the Repository:**
 
    ```sh
-   git clone https://github.com/your-repo/leo-vegas-user-management.git
-   cd leo-vegas-user-management
+   git clone https://github.com/mojtabaghiasi/user-api-task.git
    ```
 
 2. **Install Dependencies:**
