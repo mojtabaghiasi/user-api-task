@@ -63,9 +63,7 @@ describe('UsersService', () => {
       const result = await usersService.create(createUserDto);
       expect(result).toEqual({
         id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: Role.USER,
+        ...createUserDto,
       });
     });
 
