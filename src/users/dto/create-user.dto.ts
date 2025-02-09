@@ -17,12 +17,14 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
   @ApiProperty({
     example: 'test@test.com',
     description: 'The email address of the user',
   })
   @IsEmail()
   email: string;
+
   @ApiProperty({
     enum: Role,
     example: Role.USER,
@@ -30,6 +32,7 @@ export class CreateUserDto {
   })
   @IsEnum({ ADMIN: 'ADMIN', USER: 'USER' }, { message: 'Valid Role Required' })
   role: Role;
+
   @ApiProperty()
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
