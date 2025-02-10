@@ -71,12 +71,6 @@ This project is a **User Management System** implemented as part of the task. It
 ```sh
 # Unit tests
 npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
 ```
 
 ## Running with Docker
